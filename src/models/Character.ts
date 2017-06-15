@@ -55,7 +55,7 @@ const calculateLevel = function calculateLevel(cost: number) {
   let remainingCost = cost;
   while (remainingCost > 0) {
     remainingCost -= 10 + Math.floor(level / 5) + 3;
-    level++;
+    if (remainingCost > 0) level++;
   }
 
   return level;
