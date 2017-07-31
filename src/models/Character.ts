@@ -62,6 +62,7 @@ const calculateLevel = function calculateLevel(cost: number) {
 };
 
 export default class Character {
+  [key: string]: number | Function | Details | Partial<Stats>;
   details: Details;
   stats: Partial<Stats>;
 
@@ -96,7 +97,7 @@ export default class Character {
         stat =>
           mult[stat]
             ? this.stats[stat] * mult[stat] / TOTAL_MULTIPLIER +
-                Math.floor(this.stats[stat] / (TOTAL_MULTIPLIER * 0.75 - mult[stat] || 1))
+              Math.floor(this.stats[stat] / (TOTAL_MULTIPLIER * 0.75 - mult[stat] || 1))
             : 0,
       )
       .reduce((acc, stat) => acc + stat, 0);

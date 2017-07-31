@@ -42,7 +42,34 @@ export default class CharacterInfo extends React.Component<Props, State> {
         </div>
         <div>
           <span>Base Stats</span>
-          
+          <form>
+            {Object.keys(this.props.character.stats).map(stat =>
+              <label>
+                {stat}:<input
+                  type="number"
+                  name={`${this.props.character.details.name}${stat}`}
+                  value={this.props.character.stats[stat]}
+                />
+              </label>,
+            )}
+            <input type="submit">Save</input>
+          </form>
+        </div>
+        <div>
+          <span>Derived Stats</span>
+          {Object.keys(this.props.character).map(stat => {
+            if (typeof this.props.character[stat] !== 'number') return;
+            return (
+              <div>
+                <span>
+                  {stat.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
+                </span>
+                <span>
+                  {this.props.character[stat]}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
