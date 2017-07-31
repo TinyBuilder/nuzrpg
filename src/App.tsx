@@ -1,30 +1,31 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import Character from './models/Character';
+import Character, { Armor, Weapon, Details, Stats } from './models/Character';
+import CharacterStore from './stores/CharacterStore';
 
 type State = {
-  character: Character;
+  store: CharacterStore;
 };
 
 export default class App extends React.Component<{}, State> {
   constructor() {
     super();
-    this.state = {
-      character: new Character(
-        { name: '', class: '', gender: '-', spritesheet: '' },
-        {
-          level: 1,
-          str: 10,
-          dex: 10,
-          agi: 10,
-          afn: 10,
-          cha: 10,
-          gay: 50,
-          edg: 50,
-          mta: 50,
-          luk: 10,
-        },
-      ),
-    };
+    this.state = { store: CharacterStore.load() };
+  }
+
+  createNewCharacter(details: Details, stats: Stats) {
+    this.setState({ store: this.state.store.addNewCharacter(new Character(details, stats)) });
+  }
+
+  export() {
+    this.state.store.export();
+  }
+
+  save() {
+    this.state.store.save();
+  }
+
+  import(data: string) {
+    this.setState({ store: CharacterStore.import(data) });
   }
 }

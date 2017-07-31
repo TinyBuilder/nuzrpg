@@ -1,13 +1,13 @@
 import deepFreeze from '../lib/deepFreeze';
 
-type Armor = {
+export type Armor = {
   name: string;
   defense: number;
   spDefense: number;
   dodge: number;
 };
 
-type Weapon = {
+export type Weapon = {
   name: string;
   scaling: number;
   range: number;
@@ -16,14 +16,14 @@ type Weapon = {
   accuracy: number;
 };
 
-type Details = {
+export type Details = {
   name: string;
   class: string;
   gender: 'm' | 'f' | '-' | '*';
   spritesheet: string;
 };
 
-type Stats = {
+export type Stats = {
   level: number;
   str: number;
   dex: number;
@@ -37,7 +37,7 @@ type Stats = {
   [key: string]: number;
 };
 
-type Partial<T> = { [P in keyof T]?: T[P] };
+export type Partial<T> = { [P in keyof T]?: T[P] };
 
 const TOTAL_MULTIPLIER = 20;
 
