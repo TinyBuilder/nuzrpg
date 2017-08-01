@@ -38,3 +38,5 @@ export default class App extends React.Component<{}, State> {
     );
   }
 }
+
+render(<App />, document.getElementById('container'));
