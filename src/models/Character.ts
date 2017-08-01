@@ -41,6 +41,12 @@ export type Partial<T> = { [P in keyof T]?: T[P] };
 
 const TOTAL_MULTIPLIER = 20;
 
+// const enumerable = function enumerable() {
+//   return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+//     descriptor.enumerable = true;
+//   };
+// };
+
 const calculateStatCost = function calculateStatCost(stat: number) {
   let cost = 0;
   for (let i = 10; i <= stat; i++) {
@@ -80,16 +86,55 @@ export default class Character {
         .reduce((acc, cost) => acc + cost, 0),
     );
 
+    this.concentration =
+      1000 +
+      Math.floor(this.scale({ level: 10, afn: 5, dex: 2, luk: 2, cha: 1, edg: 1, mta: -1 }) * 10);
+
+    this.stamina =
+      1000 + Math.floor(this.scale({ level: 10, str: 5, agi: 3, luk: 2, dex: 1, edg: -1 }) * 10);
+
+    this.movementRange =
+      3 + Math.floor(this.scale({ agi: 10, level: 5, afn: 3, str: 3, edg: -1 }) / 30);
+
+    this.speed =
+      10 + Math.floor(this.scale({ agi: 10, level: 5, edg: 2, luk: 2, dex: 2, str: -1 }) / 10);
+
+    this.meleeAccuracy = 50 + this.scale({ dex: 7, str: 6, level: 3, agi: 3, luk: 2, edg: -1 }) / 2;
+
+    this.rangedAccuracy =
+      50 + this.scale({ dex: 10, level: 3, agi: 3, afn: 3, luk: 2, edg: -1 }) / 2;
+
+    this.precision = this.scale({ dex: 7, luk: 6, agi: 3, edg: 3, level: 1 });
+
+    this.attack = 10 + this.scale({ str: 8, level: 5, agi: 2, luk: 2, dex: 2, edg: 1 }) / 10;
+
+    this.specialAttack = 10 + this.scale({ afn: 8, level: 5, dex: 2, mta: 2, luk: 2, edg: 1 }) / 10;
+
+    this.charm = 10 + this.scale({ cha: 10, mta: 5, level: 3, str: 2, afn: 1, edg: -1 }) / 10;
+
+    this.defense = 10 + this.scale({ str: 7, level: 5, agi: 3, luk: 3, edg: 2 }) / 10;
+
+    this.specialDefense = 10 + this.scale({ afn: 7, level: 5, mta: 4, agi: 2, luk: 2 }) / 10;
+
+    this.evasion =
+      50 + this.scale({ agi: 7, level: 5, dex: 3, luk: 2, afn: 1, mta: 1, edg: 1 }) / 2;
+
+    this.reflex = this.scale({ agi: 7, dex: 4, luk: 4, mta: 3, level: 2 });
+
+    this.social = this.scale({ luk: 10, cha: 10, mta: 10, edg: -10 });
+
+    this.intimidation = this.scale({ edg: 9, cha: 9, mta: 2 }) + this.details.name.length * 5;
+
     deepFreeze(this);
   }
 
   private scale(mult: Partial<Stats>) {
-    if (
-      Object.keys(mult)
-        .map(stat => mult[stat])
-        .reduce((acc, stat) => (stat ? acc + stat : acc), 0) !== TOTAL_MULTIPLIER
-    )
-      throw new Error(`Multipliers have to add up to exactly ${TOTAL_MULTIPLIER}`);
+    const multSum = Object.keys(mult).map(stat => mult[stat]).reduce((acc, stat) => acc + stat);
+
+    if (multSum !== TOTAL_MULTIPLIER)
+      throw new Error(
+        `Multipliers have to add up to exactly ${TOTAL_MULTIPLIER}, you have ${multSum}`,
+      );
 
     const stats = Object.keys(this.stats);
     return stats
@@ -109,74 +154,5 @@ export default class Character {
 
   updateStats(newStats: Partial<Stats>) {
     return new Character(this.details, Object.assign({}, this.stats, newStats));
-  }
-
-  get concentration() {
-    return (
-      1000 +
-      Math.floor(this.scale({ level: 10, afn: 5, dex: 2, luk: 2, cha: 1, edg: 1, mta: -1 }) * 10)
-    );
-  }
-
-  get stamina() {
-    return (
-      1000 + Math.floor(this.scale({ level: 10, str: 5, agi: 3, luk: 2, dex: 1, edg: -1 }) * 10)
-    );
-  }
-
-  get movementRange() {
-    return 3 + Math.floor(this.scale({ agi: 10, level: 5, afn: 3, str: 3, edg: -1 }) / 30);
-  }
-
-  get speed() {
-    return 10 + Math.floor(this.scale({ agi: 10, level: 5, edg: 2, luk: 2, dex: 2, str: -1 }) / 10);
-  }
-
-  get meleeAccuracy() {
-    return 50 + this.scale({ dex: 7, str: 6, level: 3, agi: 3, luk: 2, edg: -1 }) / 2;
-  }
-
-  get rangedAccuracy() {
-    return 50 + this.scale({ dex: 10, level: 3, agi: 3, afn: 3, luk: 2, edg: -1 }) / 2;
-  }
-
-  get precision() {
-    return this.scale({ dex: 7, luk: 6, agi: 3, edg: 3, level: 1 });
-  }
-
-  get attack() {
-    return 10 + this.scale({ str: 8, level: 5, agi: 2, luk: 2, dex: 2, edg: 1 }) / 10;
-  }
-
-  get specialAttack() {
-    return 10 + this.scale({ afn: 8, level: 5, dex: 2, mta: 2, luk: 2, edg: 1 }) / 10;
-  }
-
-  get charm() {
-    return 10 + this.scale({ cha: 10, mta: 5, level: 3, str: 2, afn: 1, edg: -1 }) / 10;
-  }
-
-  get defense() {
-    return 10 + this.scale({ str: 7, level: 5, agi: 3, luk: 3, edg: 2 }) / 10;
-  }
-
-  get specialDefense() {
-    return 10 + this.scale({ afn: 7, level: 5, mta: 4, agi: 2, luk: 2 }) / 10;
-  }
-
-  get evasion() {
-    return 50 + this.scale({ agi: 7, level: 5, dex: 3, luk: 2, afn: 1, mta: 1, edg: 1 }) / 2;
-  }
-
-  get reflex() {
-    return this.scale({ agi: 7, dex: 4, luk: 4, mta: 3, level: 2 });
-  }
-
-  get social() {
-    return this.scale({ luk: 10, cha: 10, edg: -10 });
-  }
-
-  get intimidation() {
-    return this.scale({ edg: 9, cha: 9, mta: 2 }) + this.details.name.length * 5;
   }
 }

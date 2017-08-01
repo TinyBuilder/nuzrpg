@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Character from './models/Character';
 
-type Props = { character: Character };
+type Props = { character: Character; update: (newChar: Character) => void };
 
 type State = { opened: boolean };
 
@@ -13,6 +13,19 @@ export default class CharacterInfo extends React.Component<Props, State> {
 
   toggleDisplay() {
     this.setState({ opened: !this.state.opened });
+  }
+
+  update(type: 'detail' | 'stat', prop: string) {
+    return (e: React.FormEvent<HTMLInputElement>) => {
+      if (type === 'detail')
+        return this.props.update(
+          this.props.character.updateDetails({ [prop]: e.currentTarget.value }),
+        );
+
+      this.props.update(
+        this.props.character.updateStats({ [prop]: parseInt(e.currentTarget.value) }),
+      );
+    };
   }
 
   render() {
@@ -27,32 +40,66 @@ export default class CharacterInfo extends React.Component<Props, State> {
 
     return (
       <div>
-        <h3 onClick={this.toggleDisplay.bind(this)}>
-          {this.props.character.details.name}
-        </h3>
+        <button onClick={this.toggleDisplay.bind(this)}>Minimize</button>
+        <input
+          type="text"
+          value={this.props.character.details.name}
+          onChange={this.update('detail', 'name').bind(this)}
+        />
+        <label>
+          Picture URL:
+          <input
+            type="text"
+            value={this.props.character.details.spritesheet}
+            onChange={this.update('detail', 'spritesheet').bind(this)}
+          />
+        </label>
         <img src={this.props.character.details.spritesheet} alt="profile" />
         <div>
-          <span>
-            Class: {this.props.character.details.class}
-          </span>
+          <label>
+            Class:
+            <input
+              type="text"
+              value={this.props.character.details.class}
+              onChange={this.update('detail', 'class').bind(this)}
+            />
+          </label>
           <br />
-          <span>
-            Gender: {this.props.character.details.gender}
-          </span>
+          <label>
+            Gender:
+            <select
+              value={this.props.character.details.gender}
+              onChange={(e: React.FormEvent<HTMLSelectElement>) => {
+                this.props.update(
+                  this.props.character.updateDetails({
+                    gender: e.currentTarget.value as 'm' | 'f' | '-' | '*',
+                  }),
+                );
+              }}
+            >
+              <option>m</option>
+              <option>f</option>
+              <option>-</option>
+              <option>*</option>
+            </select>
+          </label>
         </div>
         <div>
           <span>Base Stats</span>
           <form>
             {Object.keys(this.props.character.stats).map(stat =>
-              <label key={stat}>
-                {stat}:<input
-                  type="number"
-                  name={`${this.props.character.details.name}${stat}`}
-                  defaultValue={String(this.props.character.stats[stat])}
-                />
-              </label>,
+              <div>
+                <br />
+                <label key={stat}>
+                  {stat}:<input
+                    type="number"
+                    name={`${this.props.character.details.name}${stat}`}
+                    value={this.props.character.stats[stat]}
+                    onChange={this.update('stat', stat).bind(this)}
+                  />
+                </label>
+              </div>,
             )}
-            <input type="submit" value="Save" />
           </form>
         </div>
         <div>

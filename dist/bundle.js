@@ -9790,29 +9790,48 @@ class CharacterInfo extends React.Component {
     toggleDisplay() {
         this.setState({ opened: !this.state.opened });
     }
+    update(type, prop) {
+        return (e) => {
+            if (type === 'detail')
+                return this.props.update(this.props.character.updateDetails({ [prop]: e.currentTarget.value }));
+            this.props.update(this.props.character.updateStats({ [prop]: parseInt(e.currentTarget.value) }));
+        };
+    }
     render() {
         if (!this.state.opened)
             return (React.createElement("div", null,
                 React.createElement("h3", { onClick: this.toggleDisplay.bind(this) }, this.props.character.details.name)));
         return (React.createElement("div", null,
-            React.createElement("h3", { onClick: this.toggleDisplay.bind(this) }, this.props.character.details.name),
+            React.createElement("button", { onClick: this.toggleDisplay.bind(this) }, "Minimize"),
+            React.createElement("input", { type: "text", value: this.props.character.details.name, onChange: this.update('detail', 'name').bind(this) }),
+            React.createElement("label", null,
+                "Picture URL:",
+                React.createElement("input", { type: "text", value: this.props.character.details.spritesheet, onChange: this.update('detail', 'spritesheet').bind(this) })),
             React.createElement("img", { src: this.props.character.details.spritesheet, alt: "profile" }),
             React.createElement("div", null,
-                React.createElement("span", null,
-                    "Class: ",
-                    this.props.character.details.class),
+                React.createElement("label", null,
+                    "Class:",
+                    React.createElement("input", { type: "text", value: this.props.character.details.class, onChange: this.update('detail', 'class').bind(this) })),
                 React.createElement("br", null),
-                React.createElement("span", null,
-                    "Gender: ",
-                    this.props.character.details.gender)),
+                React.createElement("label", null,
+                    "Gender:",
+                    React.createElement("select", { value: this.props.character.details.gender, onChange: (e) => {
+                            this.props.update(this.props.character.updateDetails({
+                                gender: e.currentTarget.value,
+                            }));
+                        } },
+                        React.createElement("option", null, "m"),
+                        React.createElement("option", null, "f"),
+                        React.createElement("option", null, "-"),
+                        React.createElement("option", null, "*")))),
             React.createElement("div", null,
                 React.createElement("span", null, "Base Stats"),
-                React.createElement("form", null,
-                    Object.keys(this.props.character.stats).map(stat => React.createElement("label", { key: stat },
+                React.createElement("form", null, Object.keys(this.props.character.stats).map(stat => React.createElement("div", null,
+                    React.createElement("br", null),
+                    React.createElement("label", { key: stat },
                         stat,
                         ":",
-                        React.createElement("input", { type: "number", name: `${this.props.character.details.name}${stat}`, defaultValue: String(this.props.character.stats[stat]) }))),
-                    React.createElement("input", { type: "submit", value: "Save" }))),
+                        React.createElement("input", { type: "number", name: `${this.props.character.details.name}${stat}`, value: this.props.character.stats[stat], onChange: this.update('stat', stat).bind(this) })))))),
             React.createElement("div", null,
                 React.createElement("span", null, "Derived Stats"),
                 Object.keys(this.props.character).map(stat => {
@@ -9838,6 +9857,11 @@ exports.default = CharacterInfo;
 Object.defineProperty(exports, "__esModule", { value: true });
 const deepFreeze_1 = __webpack_require__(50);
 const TOTAL_MULTIPLIER = 20;
+// const enumerable = function enumerable() {
+//   return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+//     descriptor.enumerable = true;
+//   };
+// };
 const calculateStatCost = function calculateStatCost(stat) {
     let cost = 0;
     for (let i = 10; i <= stat; i++) {
@@ -9864,13 +9888,35 @@ class Character {
         this.stats.level = calculateLevel(Object.keys(this.stats)
             .map(stat => calculateStatCost(this.stats[stat]))
             .reduce((acc, cost) => acc + cost, 0));
+        this.concentration =
+            1000 +
+                Math.floor(this.scale({ level: 10, afn: 5, dex: 2, luk: 2, cha: 1, edg: 1, mta: -1 }) * 10);
+        this.stamina =
+            1000 + Math.floor(this.scale({ level: 10, str: 5, agi: 3, luk: 2, dex: 1, edg: -1 }) * 10);
+        this.movementRange =
+            3 + Math.floor(this.scale({ agi: 10, level: 5, afn: 3, str: 3, edg: -1 }) / 30);
+        this.speed =
+            10 + Math.floor(this.scale({ agi: 10, level: 5, edg: 2, luk: 2, dex: 2, str: -1 }) / 10);
+        this.meleeAccuracy = 50 + this.scale({ dex: 7, str: 6, level: 3, agi: 3, luk: 2, edg: -1 }) / 2;
+        this.rangedAccuracy =
+            50 + this.scale({ dex: 10, level: 3, agi: 3, afn: 3, luk: 2, edg: -1 }) / 2;
+        this.precision = this.scale({ dex: 7, luk: 6, agi: 3, edg: 3, level: 1 });
+        this.attack = 10 + this.scale({ str: 8, level: 5, agi: 2, luk: 2, dex: 2, edg: 1 }) / 10;
+        this.specialAttack = 10 + this.scale({ afn: 8, level: 5, dex: 2, mta: 2, luk: 2, edg: 1 }) / 10;
+        this.charm = 10 + this.scale({ cha: 10, mta: 5, level: 3, str: 2, afn: 1, edg: -1 }) / 10;
+        this.defense = 10 + this.scale({ str: 7, level: 5, agi: 3, luk: 3, edg: 2 }) / 10;
+        this.specialDefense = 10 + this.scale({ afn: 7, level: 5, mta: 4, agi: 2, luk: 2 }) / 10;
+        this.evasion =
+            50 + this.scale({ agi: 7, level: 5, dex: 3, luk: 2, afn: 1, mta: 1, edg: 1 }) / 2;
+        this.reflex = this.scale({ agi: 7, dex: 4, luk: 4, mta: 3, level: 2 });
+        this.social = this.scale({ luk: 10, cha: 10, mta: 10, edg: -10 });
+        this.intimidation = this.scale({ edg: 9, cha: 9, mta: 2 }) + this.details.name.length * 5;
         deepFreeze_1.default(this);
     }
     scale(mult) {
-        if (Object.keys(mult)
-            .map(stat => mult[stat])
-            .reduce((acc, stat) => (stat ? acc + stat : acc), 0) !== TOTAL_MULTIPLIER)
-            throw new Error(`Multipliers have to add up to exactly ${TOTAL_MULTIPLIER}`);
+        const multSum = Object.keys(mult).map(stat => mult[stat]).reduce((acc, stat) => acc + stat);
+        if (multSum !== TOTAL_MULTIPLIER)
+            throw new Error(`Multipliers have to add up to exactly ${TOTAL_MULTIPLIER}, you have ${multSum}`);
         const stats = Object.keys(this.stats);
         return stats
             .map(stat => mult[stat]
@@ -9884,55 +9930,6 @@ class Character {
     }
     updateStats(newStats) {
         return new Character(this.details, Object.assign({}, this.stats, newStats));
-    }
-    get concentration() {
-        return (1000 +
-            Math.floor(this.scale({ level: 10, afn: 5, dex: 2, luk: 2, cha: 1, edg: 1, mta: -1 }) * 10));
-    }
-    get stamina() {
-        return (1000 + Math.floor(this.scale({ level: 10, str: 5, agi: 3, luk: 2, dex: 1, edg: -1 }) * 10));
-    }
-    get movementRange() {
-        return 3 + Math.floor(this.scale({ agi: 10, level: 5, afn: 3, str: 3, edg: -1 }) / 30);
-    }
-    get speed() {
-        return 10 + Math.floor(this.scale({ agi: 10, level: 5, edg: 2, luk: 2, dex: 2, str: -1 }) / 10);
-    }
-    get meleeAccuracy() {
-        return 50 + this.scale({ dex: 7, str: 6, level: 3, agi: 3, luk: 2, edg: -1 }) / 2;
-    }
-    get rangedAccuracy() {
-        return 50 + this.scale({ dex: 10, level: 3, agi: 3, afn: 3, luk: 2, edg: -1 }) / 2;
-    }
-    get precision() {
-        return this.scale({ dex: 7, luk: 6, agi: 3, edg: 3, level: 1 });
-    }
-    get attack() {
-        return 10 + this.scale({ str: 8, level: 5, agi: 2, luk: 2, dex: 2, edg: 1 }) / 10;
-    }
-    get specialAttack() {
-        return 10 + this.scale({ afn: 8, level: 5, dex: 2, mta: 2, luk: 2, edg: 1 }) / 10;
-    }
-    get charm() {
-        return 10 + this.scale({ cha: 10, mta: 5, level: 3, str: 2, afn: 1, edg: -1 }) / 10;
-    }
-    get defense() {
-        return 10 + this.scale({ str: 7, level: 5, agi: 3, luk: 3, edg: 2 }) / 10;
-    }
-    get specialDefense() {
-        return 10 + this.scale({ afn: 7, level: 5, mta: 4, agi: 2, luk: 2 }) / 10;
-    }
-    get evasion() {
-        return 50 + this.scale({ agi: 7, level: 5, dex: 3, luk: 2, afn: 1, mta: 1, edg: 1 }) / 2;
-    }
-    get reflex() {
-        return this.scale({ agi: 7, dex: 4, luk: 4, mta: 3, level: 2 });
-    }
-    get social() {
-        return this.scale({ luk: 10, cha: 10, edg: -10 });
-    }
-    get intimidation() {
-        return this.scale({ edg: 9, cha: 9, mta: 2 }) + this.details.name.length * 5;
     }
 }
 exports.default = Character;
@@ -10040,7 +10037,10 @@ class App extends React.Component {
     }
     render() {
         return (React.createElement("div", null,
-            this.state.store.characters.map((character, index) => React.createElement(CharacterInfo_1.default, { character: character, key: index })),
+            this.state.store.characters.map((character, index) => React.createElement(CharacterInfo_1.default, { character: character, update: (newChar) => {
+                    this.save();
+                    this.setState({ store: this.state.store.updateCharacter(index, newChar) });
+                }, key: index })),
             React.createElement("button", { onClick: this.createNewCharacter.bind(this) }, "Add new character")));
     }
 }

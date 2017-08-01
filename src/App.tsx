@@ -50,7 +50,14 @@ export default class App extends React.Component<{}, State> {
     return (
       <div>
         {this.state.store.characters.map((character, index) =>
-          <CharacterInfo character={character} key={index} />,
+          <CharacterInfo
+            character={character}
+            update={(newChar: Character) => {
+              this.save();
+              this.setState({ store: this.state.store.updateCharacter(index, newChar) });
+            }}
+            key={index}
+          />,
         )}
         <button onClick={this.createNewCharacter.bind(this)}>Add new character</button>
       </div>
