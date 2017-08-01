@@ -26,6 +26,12 @@ export default class CharacterStore {
     );
   }
 
+  updateCharacter(id: number, character: Character) {
+    return new CharacterStore(
+      this.characters.slice(0, id - 1).concat(character).concat(this.characters.slice(id + 1)),
+    );
+  }
+
   export() {
     return JSON.stringify(this.characters);
   }

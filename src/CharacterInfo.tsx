@@ -19,7 +19,7 @@ export default class CharacterInfo extends React.Component<Props, State> {
     if (!this.state.opened)
       return (
         <div>
-          <h3>
+          <h3 onClick={this.toggleDisplay.bind(this)}>
             {this.props.character.details.name}
           </h3>
         </div>
@@ -27,7 +27,7 @@ export default class CharacterInfo extends React.Component<Props, State> {
 
     return (
       <div>
-        <h3>
+        <h3 onClick={this.toggleDisplay.bind(this)}>
           {this.props.character.details.name}
         </h3>
         <img src={this.props.character.details.spritesheet} alt="profile" />
@@ -44,15 +44,15 @@ export default class CharacterInfo extends React.Component<Props, State> {
           <span>Base Stats</span>
           <form>
             {Object.keys(this.props.character.stats).map(stat =>
-              <label>
+              <label key={stat}>
                 {stat}:<input
                   type="number"
                   name={`${this.props.character.details.name}${stat}`}
-                  value={this.props.character.stats[stat]}
+                  defaultValue={String(this.props.character.stats[stat])}
                 />
               </label>,
             )}
-            <input type="submit">Save</input>
+            <input type="submit" value="Save" />
           </form>
         </div>
         <div>
@@ -60,7 +60,7 @@ export default class CharacterInfo extends React.Component<Props, State> {
           {Object.keys(this.props.character).map(stat => {
             if (typeof this.props.character[stat] !== 'number') return;
             return (
-              <div>
+              <div key={stat}>
                 <span>
                   {stat.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
                 </span>

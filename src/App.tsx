@@ -8,14 +8,30 @@ type State = {
   store: CharacterStore;
 };
 
+const defaultDetails: Details = { name: 'Name', class: 'Class', gender: '-', spritesheet: 'none' };
+const defaultStats: Stats = {
+  level: 0,
+  str: 0,
+  dex: 0,
+  agi: 0,
+  afn: 0,
+  cha: 0,
+  gay: 0,
+  edg: 0,
+  mta: 0,
+  luk: 0,
+};
+
 export default class App extends React.Component<{}, State> {
   constructor() {
     super();
     this.state = { store: CharacterStore.load() };
   }
 
-  createNewCharacter(details: Details, stats: Stats) {
-    this.setState({ store: this.state.store.addNewCharacter(new Character(details, stats)) });
+  createNewCharacter() {
+    this.setState({
+      store: this.state.store.addNewCharacter(new Character(defaultDetails, defaultStats)),
+    });
   }
 
   export() {
@@ -33,7 +49,10 @@ export default class App extends React.Component<{}, State> {
   render() {
     return (
       <div>
-        {this.state.store.characters.map(character => <CharacterInfo character={character} />)}
+        {this.state.store.characters.map((character, index) =>
+          <CharacterInfo character={character} key={index} />,
+        )}
+        <button onClick={this.createNewCharacter.bind(this)}>Add new character</button>
       </div>
     );
   }
