@@ -120,39 +120,41 @@ export default class CharacterInfo extends React.Component<Props, State> {
             </select>
           </label>
         </div>
-        <div style={{ marginTop: '8px' }}>
-          <span style={{ fontSize: '2em' }}>Base Stats</span>
-          <form>
-            {Object.keys(this.props.character.stats).map(stat =>
-              <div>
-                <br />
-                <label key={stat}>
-                  {stat}:<input
-                    type="number"
-                    name={`${this.props.character.details.name}${stat}`}
-                    value={this.props.character.stats[stat]}
-                    onChange={this.update('stat', stat).bind(this)}
-                  />
-                </label>
-              </div>,
-            )}
-          </form>
-        </div>
-        <div>
-          <span>Derived Stats</span>
-          {Object.keys(this.props.character).map(stat => {
-            if (typeof this.props.character[stat] !== 'number') return;
-            return (
-              <div key={stat}>
-                <span>
-                  {stat.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
-                </span>
-                <span>
-                  {this.props.character[stat]}
-                </span>
-              </div>
-            );
-          })}
+        <div style={{ float: 'left' }}>
+          <div style={{ margin: '8px', float: 'left' }}>
+            <span style={{ fontSize: '2em' }}>Base Stats</span>
+            <form>
+              {Object.keys(this.props.character.stats).map(stat =>
+                <div>
+                  <br />
+                  <label key={stat}>
+                    {stat}:<input
+                      type="number"
+                      name={`${this.props.character.details.name}${stat}`}
+                      value={this.props.character.stats[stat]}
+                      onChange={this.update('stat', stat).bind(this)}
+                    />
+                  </label>
+                </div>,
+              )}
+            </form>
+          </div>
+          <div>
+            <span>Derived Stats</span>
+            {Object.keys(this.props.character).map(stat => {
+              if (typeof this.props.character[stat] !== 'number') return;
+              return (
+                <div key={stat}>
+                  <span>
+                    {stat.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
+                  </span>
+                  <span>
+                    {this.props.character[stat]}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
