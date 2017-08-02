@@ -1,3 +1,6 @@
+const webpack = require('webpack');
+const BabiliPlugin = require('babili-webpack-plugin');
+
 module.exports = {
   entry: './src/App.tsx',
   output: {
@@ -31,4 +34,15 @@ module.exports = {
   //   react: 'React',
   //   'react-dom': 'ReactDOM',
   // },
+
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('production'),
+      },
+    }),
+    new webpack.LoaderOptionsPlugin({ minimize: true }),
+    new BabiliPlugin({}, { comments: false }),
+    new webpack.optimize.AggressiveMergingPlugin(),
+  ],
 };

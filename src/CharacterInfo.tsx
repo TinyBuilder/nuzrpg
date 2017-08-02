@@ -5,6 +5,20 @@ type Props = { character: Character; update: (newChar: Character) => void };
 
 type State = { opened: boolean };
 
+const containerStyle: React.CSSProperties = {
+  backgroundColor: 'white',
+  marginBottom: '8px',
+  paddingTop: '8px',
+  position: 'relative',
+};
+
+const textBoxStyle: React.CSSProperties = {
+  border: 0,
+  borderBottom: '1px solid gainsboro',
+  padding: '8px 8px 0',
+  fontSize: '1em',
+};
+
 export default class CharacterInfo extends React.Component<Props, State> {
   constructor(props: Props) {
     super();
@@ -31,35 +45,52 @@ export default class CharacterInfo extends React.Component<Props, State> {
   render() {
     if (!this.state.opened)
       return (
-        <div>
-          <h3 onClick={this.toggleDisplay.bind(this)}>
+        <div style={containerStyle} onClick={this.toggleDisplay.bind(this)}>
+          <h3 style={{ margin: 0 }}>
             {this.props.character.details.name}
           </h3>
+          <span style={{ color: 'gainsboro' }}>Click to expand</span>
         </div>
       );
 
     return (
-      <div>
-        <button onClick={this.toggleDisplay.bind(this)}>Minimize</button>
+      <div style={containerStyle}>
+        <button
+          style={{
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            padding: '8px',
+            backgroundColor: 'gainsboro',
+            border: 0,
+          }}
+          onClick={this.toggleDisplay.bind(this)}
+        >
+          Minimize
+        </button>
         <input
           type="text"
+          style={textBoxStyle}
           value={this.props.character.details.name}
           onChange={this.update('detail', 'name').bind(this)}
         />
+        <br />
         <label>
-          Picture URL:
+          Avatar URL:
           <input
             type="text"
+            style={textBoxStyle}
             value={this.props.character.details.spritesheet}
             onChange={this.update('detail', 'spritesheet').bind(this)}
           />
         </label>
-        <img src={this.props.character.details.spritesheet} alt="profile" />
+        <img src={this.props.character.details.spritesheet} alt="avatar" />
         <div>
           <label>
             Class:
             <input
               type="text"
+              style={textBoxStyle}
               value={this.props.character.details.class}
               onChange={this.update('detail', 'class').bind(this)}
             />
@@ -68,6 +99,11 @@ export default class CharacterInfo extends React.Component<Props, State> {
           <label>
             Gender:
             <select
+              style={{
+                backgroundColor: 'transparent',
+                border: 0,
+                borderBottom: '1px solid gainsboro',
+              }}
               value={this.props.character.details.gender}
               onChange={(e: React.FormEvent<HTMLSelectElement>) => {
                 this.props.update(
@@ -84,8 +120,8 @@ export default class CharacterInfo extends React.Component<Props, State> {
             </select>
           </label>
         </div>
-        <div>
-          <span>Base Stats</span>
+        <div style={{ marginTop: '8px' }}>
+          <span style={{ fontSize: '2em' }}>Base Stats</span>
           <form>
             {Object.keys(this.props.character.stats).map(stat =>
               <div>
