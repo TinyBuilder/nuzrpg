@@ -1,4 +1,21 @@
-// Place your settings in this file to overwrite default and user settings.
 {
+  "editor.fontFamily": "hack",
+  "editor.fontSize": 12,
+  "editor.fontLigatures": true,
+  "editor.minimap.enabled": true,
+  "editor.minimap.maxColumn": 120,
+  "prettier.printWidth": 100,
+  "prettier.singleQuote": true,
+  "prettier.trailingComma": "all",
+  "workbench.colorTheme": "Monokai Dimmed",
+
+  "[typescript]": {
+    "editor.rulers": [100],
     "editor.tabSize": 2
+  },
+
+  "[rust]": {
+    "editor.rulers": [80],
+    "editor.tabSize": 4
+  }
 }

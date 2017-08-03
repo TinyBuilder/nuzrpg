@@ -1,0 +1,7 @@
+[package]
+name = "nuzrpg"
+version = "0.1.0"
+authors = ["ivan.fernando.w@gmail.com"]
+
+[dependencies]
+iron = "0.5.*"
