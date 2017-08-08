@@ -1,11 +1,14 @@
 extern crate iron;
+extern crate staticfile;
+extern crate mount;
 
 use iron::prelude::*;
-use iron::status;
+use staticfile::Static;
+use mount::Mount;
 
 fn main() {
-    Iron::new(|_: &mut Request| {
-        Ok(Response::with((status::Ok, "Hello World!")))
-    }).http("localhost:3000")
-        .unwrap();
+    let mut mount = Mount::new();
+    mount.mount("/", Static::new("index.html"));
+    mount.mount("/dist/", Static::new("dist/"));
+    Iron::new(mount).http("127.0.0.1:3000").unwrap();
 }

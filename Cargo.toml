@@ -5,3 +5,8 @@ authors = ["ivan.fernando.w@gmail.com"]
 
 [dependencies]
 iron = "0.5.*"
+router = "*"
+staticfile = "*"
+
+[dependencies.mount]
+git = "https://github.com/iron/mount.git"
